@@ -1,11 +1,41 @@
+import axios from "axios"
 
 
 export default function CreateProduct() {
+
+
+    async function createProduct(e) {
+        e.preventDefault();
+        
+        console.log("Form submitted")
+
+        try {
+            const response = await axios.post("http://127.0.0.1:8080/products", {
+                name: "react name",
+                price: 20.1,
+                stock: 10,
+                images: [
+                    {
+                        url: "react.url",
+                        isPrimary: true
+                    }
+                ]
+            });
+
+            console.log("Response from Go", response.data)
+        } catch (error) {
+            console.log("Error from Go", error)
+        }
+
+        console.log("End function")
+    }
+
+
     return (
         <div className='flex items-center justify-center w-full h-screen bg-gradient-to-br from-blue-50 to-indigo-100'>
 
             <div className="flex flex-col min-w-1/4 h-auto bg-white/80 border-gray-700 items-center justify-between rounded-lg shadow-2xl">
-                <form className="rounded px-8 pt-6 pb-8 mb-4">
+                <form className="rounded px-8 pt-6 pb-8 mb-4" onSubmit={e =>createProduct(e)}>
                     <div className="mb-4">
                         <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="username">
                             Name
@@ -48,7 +78,7 @@ export default function CreateProduct() {
                     </div>
 
                     <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold my-8 py-2 px-4 
-                    rounded focus:outline-none focus:shadow-outline hover:cursor-pointer" type="button">
+                    rounded focus:outline-none focus:shadow-outline hover:cursor-pointer" type="submit">
                         Create
                     </button>
                 </form>
