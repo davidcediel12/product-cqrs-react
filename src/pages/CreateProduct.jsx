@@ -11,7 +11,8 @@ export default function CreateProduct() {
         productName: '',
         price: '',
         stock: '',
-        images: []
+        images: [],
+        imagePreview: null
     });
 
     async function createProduct(e) {
@@ -45,21 +46,29 @@ export default function CreateProduct() {
         const { name, value, files, type } = e.target; // 'name' and 'value' can be any field. It depends on which one changes
 
 
-        let content;
-
-        if(type === 'file'){
-            content = files;
-        } else {
-            content = value;
-        }
-
-
         console.log(name + " of type " + type + " changed: " + value)
 
+        if(type === 'file'){
 
+            const file = files[0];
+
+            const previewUrl = URL.createObjectURL(file);
+
+            console.log("new preview url: " + previewUrl)
+
+            setFormData((prev) => ({
+                ...prev,
+                [name]: files,
+                imagePreview: previewUrl
+            }));
+
+            return;
+        }
+
+        
         setFormData((prev) => ({
             ...prev,
-            [name]: content // [name] with braces cuz I'm using a variable, not the attribute 'name' 
+            [name]: value // [name] with braces cuz I'm using a variable, not the attribute 'name' 
         }))
     }
 
@@ -128,6 +137,14 @@ export default function CreateProduct() {
                                 onChange={e => onFormChange(e)}
                              />
                         </label>
+
+                        {formData.imagePreview && (
+                            <img
+                            src={formData.imagePreview}
+                            alt="preview"
+                            className="bg-blue-500 hover:bg-blue-700 text-white font-bold rounded 
+                            hover:cursor-pointer max-w-8"/>
+                        )}
                     </div>
 
                     <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold my-8 py-2 px-4 
