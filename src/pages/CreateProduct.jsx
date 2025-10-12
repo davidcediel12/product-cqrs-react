@@ -21,12 +21,13 @@ export default function CreateProduct() {
 
     useEffect(() => {
         return () => { // When the use effect returns a function, it is called before removing the component
-            if (formData.imagePreview) {
+            formData.imagePreviews.forEach(imagePreview => {
+
                 console.log("Removing image preview to avoid memory leaks");
-                URL.revokeObjectURL(formData.imagePreview);
-            }
+                URL.revokeObjectURL(imagePreview);
+            })
         }
-    });
+    }, [formData.imagePreviews]);
 
 
     async function createProduct(e) {
@@ -89,7 +90,7 @@ export default function CreateProduct() {
 
     function deleteImage(index) {
 
-
+        console.log("Deleting the image " + index);
 
         setFormData((prev) => {
             const newImages = [...prev.images];
@@ -98,6 +99,8 @@ export default function CreateProduct() {
 
             newImages.splice(index, 1);
             const [removedUrl] = newPrevies.splice(index, 1);
+            
+            console.log("removing " + removedUrl);
 
             URL.revokeObjectURL(removedUrl);
 
@@ -105,7 +108,7 @@ export default function CreateProduct() {
             return {
                 ...prev,
                 images: newImages,
-                imagePreview: newPrevies
+                imagePreviews: newPrevies
 
             };
         });
@@ -186,12 +189,12 @@ export default function CreateProduct() {
                                     className="bg-blue-500 hover:bg-blue-700 text-white font-bold rounded 
                             hover:cursor-pointer max-w-8"/>
 
-                                <button onClick={_ => deleteImage(index)}>
+                                <button  type="button" onClick={() => deleteImage(index)}>
                                     <FaTrash className="hover:cursor-pointer hover:text-red-500" />
                                 </button>
 
                                 <button>
-                                    <FaPlus className="hover:cursor-pointer hover:text-blue-500" />
+                                    <FaPlus type="button" className="hover:cursor-pointer hover:text-blue-500" />
                                 </button>
                             </div>
                         ))}
