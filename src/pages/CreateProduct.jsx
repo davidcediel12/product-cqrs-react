@@ -76,8 +76,8 @@ export default function CreateProduct() {
         try {
             const response = await axios.post(API_URL + "/products", {
                 name: formData.productName,
-                price: formData.price,
-                stock: formData.stock,
+                price: parseFloat(formData.price),
+                stock: parseInt(formData.stock),
                 images: backendImages
             });
 
