@@ -1,17 +1,27 @@
 import axios from "axios"
+import { useState } from "react";
+
+// const API_URL = "http://ad008d72c25544a379eabb72fc401561-1818218894.us-east-2.elb.amazonaws.com:8080"
+const API_URL = "http://localhost:8080"
 
 
 export default function CreateProduct() {
 
+    const [formData, setFormData] = useState({
+        productName: '',
+        price: '',
+        stock: '',
+        images: []
+    });
 
     async function createProduct(e) {
         e.preventDefault();
-        
+
         console.log("Form submitted")
 
         try {
-            const response = await axios.post("http://127.0.0.1:8080/products", {
-                name: "react name",
+            const response = await axios.post(API_URL + "/products", {
+                productName: "react name",
                 price: 20.1,
                 stock: 10,
                 images: [
@@ -31,17 +41,36 @@ export default function CreateProduct() {
     }
 
 
+    function onFormChange(e) {
+        const { name, value } = e.target; // 'name' and 'value' can be any field. It depends on which one changes
+
+        console.log(name + " changed: " + value)
+
+
+        setFormData((prev) => ({
+            ...prev,
+            [name]: value // [name] with braces cuz I'm using a variable, not the attribute 'name' 
+        }))
+    }
+
+
     return (
         <div className='flex items-center justify-center w-full h-screen bg-gradient-to-br from-blue-50 to-indigo-100'>
 
             <div className="flex flex-col min-w-1/4 h-auto bg-white/80 border-gray-700 items-center justify-between rounded-lg shadow-2xl">
-                <form className="rounded px-8 pt-6 pb-8 mb-4" onSubmit={e =>createProduct(e)}>
+                <form className="rounded px-8 pt-6 pb-8 mb-4"
+                    onSubmit={e => createProduct(e)}>
                     <div className="mb-4">
-                        <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="username">
+                        <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="product-name">
                             Name
                         </label>
                         <input className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 
-                        leading-tight focus:outline-none focus:shadow-outline" id="username" type="text" placeholder="Product xyz" />
+                        leading-tight focus:outline-none focus:shadow-outline"
+                            id="product-name" type="text"
+                            placeholder="Product xyz"
+                            name="productName"
+                            onChange={e => onFormChange(e)}
+                            value={formData.productName} />
                     </div>
 
 
@@ -50,7 +79,13 @@ export default function CreateProduct() {
                             Price
                         </label>
                         <input className="shadow appearance-none border rounded w-2/4 py-2 px-3 text-gray-700 
-                        leading-tight focus:outline-none focus:shadow-outline" id="price" type="number" placeholder="100.5" />
+                        leading-tight focus:outline-none focus:shadow-outline"
+                            id="price"
+                            type="number"
+                            name="price"
+                            placeholder="100.5"
+                            onChange={e => onFormChange(e)}
+                            value={formData.price} />
                     </div>
 
 
@@ -59,7 +94,13 @@ export default function CreateProduct() {
                             Stock
                         </label>
                         <input className="shadow appearance-none border rounded w-2/4 py-2 px-3 text-gray-700 
-                        leading-tight focus:outline-none focus:shadow-outline" id="stock" type="number" placeholder="5" step={1} />
+                        leading-tight focus:outline-none focus:shadow-outline"
+                            id="stock"
+                            type="number"
+                            name="stock"
+                            placeholder="5" step={1}
+                            onChange={e => onFormChange(e)}
+                            value={formData.stock} />
                     </div>
 
                     <div className="mt-4 flex text-sm/6 text-gray-400">
@@ -71,9 +112,11 @@ export default function CreateProduct() {
                             <input
                                 id="file-upload"
                                 type="file"
-                                name="file-upload"
+                                name="images"
                                 accept="image/*"
-                                className="sr-only" />
+                                className="sr-only"
+                                onChange={e => onFormChange(e)}
+                                value={formData.images[0]} />
                         </label>
                     </div>
 
