@@ -88,13 +88,13 @@ export default function CreateProduct() {
 
         console.log("Deleting the image " + imageUrl);
 
-        console.log("Images " + formData.images);
+        console.log("Images ", formData.images);
 
         const newImages = formData.images.filter(image => image.url !== imageUrl);
         URL.revokeObjectURL(imageUrl);
         
 
-        console.log("New Images " + newImages);
+        console.log("New Images ", newImages);
 
         setFormData((prev) => (
              {
