@@ -7,6 +7,77 @@ import { FaPlus, FaTrash } from "react-icons/fa";
 // const API_URL = "http://ad008d72c25544a379eabb72fc401561-1818218894.us-east-2.elb.amazonaws.com:8080"
 const API_URL = "http://localhost:8080"
 
+function ImageSection({ onFormChange, setFormData, formData }) {
+
+
+    function deleteImage(imageUrl) {
+
+        console.log("Deleting the image " + imageUrl);
+
+        console.log("Images ", formData.images);
+
+        const newImages = formData.images.filter(image => image.url !== imageUrl);
+        URL.revokeObjectURL(imageUrl);
+
+
+        console.log("New Images ", newImages);
+
+        setFormData((prev) => (
+            {
+                ...prev,
+                images: newImages,
+
+            }
+        ));
+    }
+
+
+    return (
+        <div>
+            <div className="mt-4 flex text-sm/6 text-gray-400">
+                <label htmlFor="file-upload" className="relative cursor-pointer rounded-md bg-transparent 
+                        font-semibold text-indigo-400 focus-within:outline-2 focus-within:outline-offset-2 
+                        focus-within:outline-indigo-500 hover:text-indigo-300">
+
+                    <span>Upload an image</span>
+                    <input
+                        id="file-upload"
+                        type="file"
+                        name="images"
+                        accept="image/*"
+                        multiple
+                        className="sr-only"
+                        onChange={e => onFormChange(e)}
+                    />
+                </label>
+
+                {formData.images.map(image => (
+
+                    <div key={image.url}>
+                        <img
+                            src={image.url}
+                            alt="preview"
+                            className="bg-blue-500 hover:bg-blue-700 text-white font-bold rounded 
+                            hover:cursor-pointer max-w-8"/>
+
+                        <button type="button" onClick={() => deleteImage(image.url)}>
+                            <FaTrash className="hover:cursor-pointer hover:text-red-500" />
+                        </button>
+
+                        <button>
+                            <FaPlus type="button" className="hover:cursor-pointer hover:text-blue-500" />
+                        </button>
+                    </div>
+                ))}
+            </div>
+        </div>
+    )
+
+
+
+}
+
+
 
 export default function CreateProduct() {
 
@@ -69,10 +140,10 @@ export default function CreateProduct() {
                 console.error("Error from S3", error)
             }
         }
-        
 
-        const backendImages = urls.map(url => url.split("?", 1)[0]).map(cleanUrl => ({url: cleanUrl, isPrimary: true}))
-        
+
+        const backendImages = urls.map(url => url.split("?", 1)[0]).map(cleanUrl => ({ url: cleanUrl, isPrimary: true }))
+
         try {
             const response = await axios.post(API_URL + "/products", {
                 name: formData.productName,
@@ -115,28 +186,6 @@ export default function CreateProduct() {
             ...prev,
             [name]: value // [name] with braces cuz I'm using a variable, not the attribute 'name' 
         }))
-    }
-
-
-    function deleteImage(imageUrl) {
-
-        console.log("Deleting the image " + imageUrl);
-
-        console.log("Images ", formData.images);
-
-        const newImages = formData.images.filter(image => image.url !== imageUrl);
-        URL.revokeObjectURL(imageUrl);
-
-
-        console.log("New Images ", newImages);
-
-        setFormData((prev) => (
-            {
-                ...prev,
-                images: newImages,
-
-            }
-        ));
     }
 
     return (
@@ -188,42 +237,10 @@ export default function CreateProduct() {
                             value={formData.stock} />
                     </div>
 
-                    <div className="mt-4 flex text-sm/6 text-gray-400">
-                        <label htmlFor="file-upload" className="relative cursor-pointer rounded-md bg-transparent 
-                        font-semibold text-indigo-400 focus-within:outline-2 focus-within:outline-offset-2 
-                        focus-within:outline-indigo-500 hover:text-indigo-300">
-
-                            <span>Upload an image</span>
-                            <input
-                                id="file-upload"
-                                type="file"
-                                name="images"
-                                accept="image/*"
-                                multiple
-                                className="sr-only"
-                                onChange={e => onFormChange(e)}
-                            />
-                        </label>
-
-                        {formData.images.map(image => (
-
-                            <div key={image.url}>
-                                <img
-                                    src={image.url}
-                                    alt="preview"
-                                    className="bg-blue-500 hover:bg-blue-700 text-white font-bold rounded 
-                            hover:cursor-pointer max-w-8"/>
-
-                                <button type="button" onClick={() => deleteImage(image.url)}>
-                                    <FaTrash className="hover:cursor-pointer hover:text-red-500" />
-                                </button>
-
-                                <button>
-                                    <FaPlus type="button" className="hover:cursor-pointer hover:text-blue-500" />
-                                </button>
-                            </div>
-                        ))}
-                    </div>
+                    <ImageSection
+                        onFormChange={onFormChange}
+                        setFormData={setFormData}
+                        formData={formData} />
 
                     <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold my-8 py-2 px-4 
                     rounded focus:outline-none focus:shadow-outline hover:cursor-pointer hover:text-green" type="submit">
