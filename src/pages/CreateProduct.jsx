@@ -44,27 +44,31 @@ export default function CreateProduct() {
 
         const urls = imageUrlsResponse.data.urls;
 
-        for(let i = 0; i < urls.length; i++){
-            console.log(`Uploading image ${formData.images[i].img.name} to url ${urls[i]}`)
+        for (let i = 0; i < urls.length; i++) {
 
-            const imageUploadResponse = await axios.put(urls[i], formData.images[i].img, {
-                headers: {
-                    "Content-Type": img.type
+
+            const img = formData.images[i].img;
+
+            console.log(`Uploading image ${img.name} to url ${urls[i]}`)
+            console.log("the image is", img)
+
+            try {
+
+                const imageUploadResponse = await axios.put(urls[i], img, {
+                    headers: {
+                        "Content-Type": img.type
+                    }
+                })
+
+                if (imageUploadResponse.status === 200) {
+                    console.log("The image was uploaded!!!!!!!")
+                } else {
+                    console.log(`Upload failed with status: ${imageUploadResponse.status}`)
                 }
-            })
-
-            if (imageUploadResponse.status === 200){
-                console.log("The image was uploaded!!!!!!!")
-            } else {
-                console.log(`Upload failed with status: ${imageUploadResponse.status}`)
+            } catch (error) {
+                console.error("Error from S3", error)
             }
         }
-
-
-
-
-
-        console.log("Image urls ", imageUrls);
 
         try {
             const response = await axios.post(API_URL + "/products", {
