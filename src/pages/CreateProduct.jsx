@@ -15,13 +15,13 @@ export default function CreateProduct() {
         price: '',
         stock: '',
         images: [],
-        imagePreview: null
+        imagePreviews: []
     });
 
 
     useEffect(() => {
         return () => { // When the use effect returns a function, it is called before removing the component
-            if(formData.imagePreview){
+            if (formData.imagePreview) {
                 console.log("Removing image preview to avoid memory leaks");
                 URL.revokeObjectURL(formData.imagePreview);
             }
@@ -36,7 +36,7 @@ export default function CreateProduct() {
 
         try {
             const response = await axios.post(API_URL + "/products", {
-                productName: "react name",
+                name: "react name",
                 price: 20.1,
                 stock: 10,
                 images: [
@@ -64,16 +64,16 @@ export default function CreateProduct() {
 
         if (type === 'file') {
 
-            const file = files[0];
+            const newFiles = Array.from(files);
 
-            const previewUrl = URL.createObjectURL(file);
+            const newPreviews = newFiles.map(file => URL.createObjectURL(file));
 
-            console.log("new preview url: " + previewUrl)
+            console.log("new preview urls: " + newPreviews)
 
             setFormData((prev) => ({
                 ...prev,
-                [name]: files,
-                imagePreview: previewUrl
+                images: [...prev.images, ...newFiles],
+                imagePreviews: [...prev.imagePreviews, ...newPreviews]
             }));
 
             return;
@@ -87,13 +87,28 @@ export default function CreateProduct() {
     }
 
 
-    function deleteImage(){
-        setFormData((prev) => ({
-            ...prev, 
-            images: [],
-            imagePreview: null
+    function deleteImage(index) {
 
-        }));
+
+
+        setFormData((prev) => {
+            const newImages = [...prev.images];
+            const newPrevies = [...prev.imagePreviews];
+
+
+            newImages.splice(index, 1);
+            const [removedUrl] = newPrevies.splice(index, 1);
+
+            URL.revokeObjectURL(removedUrl);
+
+
+            return {
+                ...prev,
+                images: newImages,
+                imagePreview: newPrevies
+
+            };
+        });
     }
 
     return (
@@ -156,29 +171,30 @@ export default function CreateProduct() {
                                 type="file"
                                 name="images"
                                 accept="image/*"
+                                multiple
                                 className="sr-only"
                                 onChange={e => onFormChange(e)}
                             />
                         </label>
 
-                        {formData.imagePreview && (
+                        {formData.imagePreviews.map((imagePreview, index) => (
 
-                            <>
+                            <div key={index}>
                                 <img
-                                    src={formData.imagePreview}
+                                    src={imagePreview}
                                     alt="preview"
                                     className="bg-blue-500 hover:bg-blue-700 text-white font-bold rounded 
                             hover:cursor-pointer max-w-8"/>
 
-                                <button onClick={deleteImage}>
+                                <button onClick={_ => deleteImage(index)}>
                                     <FaTrash className="hover:cursor-pointer hover:text-red-500" />
                                 </button>
 
                                 <button>
                                     <FaPlus className="hover:cursor-pointer hover:text-blue-500" />
                                 </button>
-                            </>
-                        )}
+                            </div>
+                        ))}
                     </div>
 
                     <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold my-8 py-2 px-4 
