@@ -69,18 +69,16 @@ export default function CreateProduct() {
                 console.error("Error from S3", error)
             }
         }
+        
 
+        const backendImages = urls.map(url => url.split("?", 1)[0]).map(cleanUrl => ({url: cleanUrl, isPrimary: true}))
+        
         try {
             const response = await axios.post(API_URL + "/products", {
-                name: "react name",
-                price: 20.1,
-                stock: 10,
-                images: [
-                    {
-                        url: "react.url",
-                        isPrimary: true
-                    }
-                ]
+                name: formData.productName,
+                price: formData.price,
+                stock: formData.stock,
+                images: backendImages
             });
 
             console.log("Response from Go", response.data)
