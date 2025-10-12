@@ -1,6 +1,6 @@
 import axios from "axios"
-import { useState } from "react";
-import { FaTrash } from "react-icons/fa";
+import { useEffect, useState } from "react";
+import { FaPlus, FaTrash } from "react-icons/fa";
 
 
 
@@ -17,6 +17,17 @@ export default function CreateProduct() {
         images: [],
         imagePreview: null
     });
+
+
+    useEffect(() => {
+        return () => { // When the use effect returns a function, it is called before removing the component
+            if(formData.imagePreview){
+                console.log("Removing image preview to avoid memory leaks");
+                URL.revokeObjectURL(formData.imagePreview);
+            }
+        }
+    });
+
 
     async function createProduct(e) {
         e.preventDefault();
@@ -161,6 +172,10 @@ export default function CreateProduct() {
 
                                 <button onClick={deleteImage}>
                                     <FaTrash className="hover:cursor-pointer hover:text-red-500" />
+                                </button>
+
+                                <button>
+                                    <FaPlus className="hover:cursor-pointer hover:text-blue-500" />
                                 </button>
                             </>
                         )}
