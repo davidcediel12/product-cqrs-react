@@ -14,20 +14,19 @@ export default function CreateProduct() {
         productName: '',
         price: '',
         stock: '',
-        images: [],
-        imagePreviews: []
+        images: []
     });
 
 
     useEffect(() => {
         return () => { // When the use effect returns a function, it is called before removing the component
-            formData.imagePreviews.forEach(imagePreview => {
+            formData.images.forEach(image => {
 
                 console.log("Removing image preview to avoid memory leaks");
-                URL.revokeObjectURL(imagePreview);
+                URL.revokeObjectURL(image.url);
             })
         }
-    }, [formData.imagePreviews]);
+    }, []);
 
 
     async function createProduct(e) {
@@ -65,17 +64,14 @@ export default function CreateProduct() {
 
         if (type === 'file') {
 
-            const newFiles = Array.from(files);
-
-            const newPreviews = newFiles.map(file => URL.createObjectURL(file));
-
-            console.log("new preview urls: " + newPreviews)
+            const newImages = Array.from(files).map(file => ({img: file, url: URL.createObjectURL(file)}));
 
             setFormData((prev) => ({
                 ...prev,
-                images: [...prev.images, ...newFiles],
-                imagePreviews: [...prev.imagePreviews, ...newPreviews]
+                images: [...prev.images, ...newImages]
             }));
+
+            e.target.value = null;
 
             return;
         }
@@ -88,30 +84,25 @@ export default function CreateProduct() {
     }
 
 
-    function deleteImage(index) {
+    function deleteImage(imageUrl) {
 
-        console.log("Deleting the image " + index);
+        console.log("Deleting the image " + imageUrl);
 
-        setFormData((prev) => {
-            const newImages = [...prev.images];
-            const newPrevies = [...prev.imagePreviews];
+        console.log("Images " + formData.images);
 
+        const newImages = formData.images.filter(image => image.url !== imageUrl);
+        URL.revokeObjectURL(imageUrl);
+        
 
-            newImages.splice(index, 1);
-            const [removedUrl] = newPrevies.splice(index, 1);
-            
-            console.log("removing " + removedUrl);
+        console.log("New Images " + newImages);
 
-            URL.revokeObjectURL(removedUrl);
-
-
-            return {
+        setFormData((prev) => (
+             {
                 ...prev,
                 images: newImages,
-                imagePreviews: newPrevies
 
-            };
-        });
+            }
+        ));
     }
 
     return (
@@ -180,16 +171,16 @@ export default function CreateProduct() {
                             />
                         </label>
 
-                        {formData.imagePreviews.map((imagePreview, index) => (
+                        {formData.images.map(image => (
 
-                            <div key={index}>
+                            <div key={image.url}>
                                 <img
-                                    src={imagePreview}
+                                    src={image.url}
                                     alt="preview"
                                     className="bg-blue-500 hover:bg-blue-700 text-white font-bold rounded 
                             hover:cursor-pointer max-w-8"/>
 
-                                <button  type="button" onClick={() => deleteImage(index)}>
+                                <button  type="button" onClick={() => deleteImage(image.url)}>
                                     <FaTrash className="hover:cursor-pointer hover:text-red-500" />
                                 </button>
 
