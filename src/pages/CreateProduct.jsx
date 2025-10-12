@@ -42,14 +42,24 @@ export default function CreateProduct() {
 
 
     function onFormChange(e) {
-        const { name, value } = e.target; // 'name' and 'value' can be any field. It depends on which one changes
+        const { name, value, files, type } = e.target; // 'name' and 'value' can be any field. It depends on which one changes
 
-        console.log(name + " changed: " + value)
+
+        let content;
+
+        if(type === 'file'){
+            content = files;
+        } else {
+            content = value;
+        }
+
+
+        console.log(name + " of type " + type + " changed: " + value)
 
 
         setFormData((prev) => ({
             ...prev,
-            [name]: value // [name] with braces cuz I'm using a variable, not the attribute 'name' 
+            [name]: content // [name] with braces cuz I'm using a variable, not the attribute 'name' 
         }))
     }
 
@@ -116,7 +126,7 @@ export default function CreateProduct() {
                                 accept="image/*"
                                 className="sr-only"
                                 onChange={e => onFormChange(e)}
-                                value={formData.images[0]} />
+                             />
                         </label>
                     </div>
 
