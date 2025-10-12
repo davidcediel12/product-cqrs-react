@@ -34,6 +34,38 @@ export default function CreateProduct() {
 
         console.log("Form submitted")
 
+
+        const imageNames = formData.images.map(image => ({ name: image.img.name }));
+
+
+        const imageUrlsResponse = await axios.post(API_URL + "/products/images/generate", {
+            images: imageNames
+        });
+
+        const urls = imageUrlsResponse.data.urls;
+
+        for(let i = 0; i < urls.length; i++){
+            console.log(`Uploading image ${formData.images[i].img.name} to url ${urls[i]}`)
+
+            const imageUploadResponse = await axios.put(urls[i], formData.images[i].img, {
+                headers: {
+                    "Content-Type": img.type
+                }
+            })
+
+            if (imageUploadResponse.status === 200){
+                console.log("The image was uploaded!!!!!!!")
+            } else {
+                console.log(`Upload failed with status: ${imageUploadResponse.status}`)
+            }
+        }
+
+
+
+
+
+        console.log("Image urls ", imageUrls);
+
         try {
             const response = await axios.post(API_URL + "/products", {
                 name: "react name",
@@ -64,7 +96,7 @@ export default function CreateProduct() {
 
         if (type === 'file') {
 
-            const newImages = Array.from(files).map(file => ({img: file, url: URL.createObjectURL(file)}));
+            const newImages = Array.from(files).map(file => ({ img: file, url: URL.createObjectURL(file) }));
 
             setFormData((prev) => ({
                 ...prev,
@@ -92,12 +124,12 @@ export default function CreateProduct() {
 
         const newImages = formData.images.filter(image => image.url !== imageUrl);
         URL.revokeObjectURL(imageUrl);
-        
+
 
         console.log("New Images ", newImages);
 
         setFormData((prev) => (
-             {
+            {
                 ...prev,
                 images: newImages,
 
@@ -180,7 +212,7 @@ export default function CreateProduct() {
                                     className="bg-blue-500 hover:bg-blue-700 text-white font-bold rounded 
                             hover:cursor-pointer max-w-8"/>
 
-                                <button  type="button" onClick={() => deleteImage(image.url)}>
+                                <button type="button" onClick={() => deleteImage(image.url)}>
                                     <FaTrash className="hover:cursor-pointer hover:text-red-500" />
                                 </button>
 
