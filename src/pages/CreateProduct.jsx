@@ -1,11 +1,9 @@
-import axios from "axios"
 import { useEffect, useState } from "react";
 import { FaPlus, FaTrash } from "react-icons/fa";
+import { productService } from "../services/productService";
+import { s3Service } from "../services/s3Service";
 
 
-
-// const API_URL = "http://ad008d72c25544a379eabb72fc401561-1818218894.us-east-2.elb.amazonaws.com:8080"
-const API_URL = "http://localhost:8080"
 
 function ImageSection({ onFormChange, setFormData, formData }) {
 
@@ -109,11 +107,11 @@ export default function CreateProduct() {
         const imageNames = formData.images.map(image => ({ name: image.img.name }));
 
 
-        const imageUrlsResponse = await axios.post(API_URL + "/products/images/generate", {
-            images: imageNames
-        });
+        const imageUrlsResponse = await productService.createImageUrls(imageNames);
 
-        const urls = imageUrlsResponse.data.urls;
+        console.log("Urls obtained", imageUrlsResponse)
+
+        const urls = imageUrlsResponse.urls;
 
         for (let i = 0; i < urls.length; i++) {
 
@@ -123,39 +121,22 @@ export default function CreateProduct() {
             console.log(`Uploading image ${img.name} to url ${urls[i]}`)
             console.log("the image is", img)
 
-            try {
-
-                const imageUploadResponse = await axios.put(urls[i], img, {
-                    headers: {
-                        "Content-Type": img.type
-                    }
-                })
-
-                if (imageUploadResponse.status === 200) {
-                    console.log("The image was uploaded!!!!!!!")
-                } else {
-                    console.log(`Upload failed with status: ${imageUploadResponse.status}`)
-                }
-            } catch (error) {
-                console.error("Error from S3", error)
-            }
+            await s3Service.uploadImageToS3(urls[i], img)
         }
 
 
         const backendImages = urls.map(url => url.split("?", 1)[0]).map(cleanUrl => ({ url: cleanUrl, isPrimary: true }))
 
-        try {
-            const response = await axios.post(API_URL + "/products", {
-                name: formData.productName,
-                price: parseFloat(formData.price),
-                stock: parseInt(formData.stock),
-                images: backendImages
-            });
 
-            console.log("Response from Go", response.data)
-        } catch (error) {
-            console.log("Error from Go", error)
-        }
+        const response = productService.createProduct({
+            name: formData.productName,
+            price: parseFloat(formData.price),
+            stock: parseInt(formData.stock),
+            images: backendImages
+        });
+
+        console.log("Response from Go", response.data)
+
 
         console.log("End function")
     }
