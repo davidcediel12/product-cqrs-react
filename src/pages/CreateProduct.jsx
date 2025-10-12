@@ -1,5 +1,8 @@
 import axios from "axios"
 import { useState } from "react";
+import { FaTrash } from "react-icons/fa";
+
+
 
 // const API_URL = "http://ad008d72c25544a379eabb72fc401561-1818218894.us-east-2.elb.amazonaws.com:8080"
 const API_URL = "http://localhost:8080"
@@ -48,7 +51,7 @@ export default function CreateProduct() {
 
         console.log(name + " of type " + type + " changed: " + value)
 
-        if(type === 'file'){
+        if (type === 'file') {
 
             const file = files[0];
 
@@ -65,13 +68,22 @@ export default function CreateProduct() {
             return;
         }
 
-        
+
         setFormData((prev) => ({
             ...prev,
             [name]: value // [name] with braces cuz I'm using a variable, not the attribute 'name' 
         }))
     }
 
+
+    function deleteImage(){
+        setFormData((prev) => ({
+            ...prev, 
+            images: [],
+            imagePreview: null
+
+        }));
+    }
 
     return (
         <div className='flex items-center justify-center w-full h-screen bg-gradient-to-br from-blue-50 to-indigo-100'>
@@ -135,20 +147,27 @@ export default function CreateProduct() {
                                 accept="image/*"
                                 className="sr-only"
                                 onChange={e => onFormChange(e)}
-                             />
+                            />
                         </label>
 
                         {formData.imagePreview && (
-                            <img
-                            src={formData.imagePreview}
-                            alt="preview"
-                            className="bg-blue-500 hover:bg-blue-700 text-white font-bold rounded 
+
+                            <>
+                                <img
+                                    src={formData.imagePreview}
+                                    alt="preview"
+                                    className="bg-blue-500 hover:bg-blue-700 text-white font-bold rounded 
                             hover:cursor-pointer max-w-8"/>
+
+                                <button onClick={deleteImage}>
+                                    <FaTrash className="hover:cursor-pointer hover:text-red-500" />
+                                </button>
+                            </>
                         )}
                     </div>
 
                     <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold my-8 py-2 px-4 
-                    rounded focus:outline-none focus:shadow-outline hover:cursor-pointer" type="submit">
+                    rounded focus:outline-none focus:shadow-outline hover:cursor-pointer hover:text-green" type="submit">
                         Create
                     </button>
                 </form>
