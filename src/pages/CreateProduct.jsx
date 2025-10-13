@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { FaPlus, FaTrash, FaSpinner } from "react-icons/fa";
 import { productService } from "../services/productService";
 import { s3Service } from "../services/s3Service";
-
+import { toast, ToastContainer  } from "react-toastify";
 
 
 function ImageSection({ onFormChange, setFormData, formData }) {
@@ -136,6 +136,10 @@ export default function CreateProduct() {
 
         setIsLoading(false);
         setFormData(getInitialFormData());
+        toast.success("Submitted!", {
+            autoClose: 1700, 
+
+        });
 
         console.log("End function");
     }
@@ -170,7 +174,7 @@ export default function CreateProduct() {
 
     return (
         <div className='flex items-center justify-center w-full h-screen bg-gradient-to-br from-blue-50 to-indigo-100'>
-
+            <ToastContainer />
             <div className="flex flex-col min-w-1/4 h-auto bg-white/80 border-gray-700 items-center justify-between rounded-lg shadow-2xl">
                 <form className="rounded px-8 pt-6 pb-8 mb-4"
                     onSubmit={e => createProduct(e)}>
