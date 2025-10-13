@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { FaPlus, FaTrash } from "react-icons/fa";
+import { FaPlus, FaTrash, FaSpinner } from "react-icons/fa";
 import { productService } from "../services/productService";
 import { s3Service } from "../services/s3Service";
 
@@ -86,6 +86,7 @@ export default function CreateProduct() {
         images: []
     });
 
+    const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
         return () => { // When the use effect returns a function, it is called before removing the component
@@ -103,13 +104,14 @@ export default function CreateProduct() {
 
         console.log("Form submitted")
 
+        setIsLoading(true)
 
         const imageNames = formData.images.map(image => ({ name: image.img.name }));
 
 
         const imageUrlsResponse = await productService.createImageUrls(imageNames);
 
-        console.log("Urls obtained", imageUrlsResponse)
+        console.log("Urls obtained", imageUrlsResponse);
 
         const urls = imageUrlsResponse.urls;
 
@@ -118,14 +120,14 @@ export default function CreateProduct() {
 
             const img = formData.images[i].img;
 
-            console.log(`Uploading image ${img.name} to url ${urls[i]}`)
-            console.log("the image is", img)
+            console.log(`Uploading image ${img.name} to url ${urls[i]}`);
+            console.log("the image is", img);
 
-            await s3Service.uploadImageToS3(urls[i], img)
+            await s3Service.uploadImageToS3(urls[i], img);
         }
 
 
-        const backendImages = urls.map(url => url.split("?", 1)[0]).map(cleanUrl => ({ url: cleanUrl, isPrimary: true }))
+        const backendImages = urls.map(url => url.split("?", 1)[0]).map(cleanUrl => ({ url: cleanUrl, isPrimary: true }));
 
 
         const response = productService.createProduct({
@@ -135,10 +137,11 @@ export default function CreateProduct() {
             images: backendImages
         });
 
-        console.log("Response from Go", response.data)
+        console.log("Response from Go", response.data);
 
+        setIsLoading(false);
 
-        console.log("End function")
+        console.log("End function");
     }
 
 
@@ -223,8 +226,11 @@ export default function CreateProduct() {
                         setFormData={setFormData}
                         formData={formData} />
 
-                    <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold my-8 py-2 px-4 
-                    rounded focus:outline-none focus:shadow-outline hover:cursor-pointer hover:text-green" type="submit">
+
+                    <button className="flex justify-center items-center gap-2  bg-blue-500 hover:bg-blue-700 text-white font-bold my-8 py-2 px-4 
+                    rounded focus:outline-none focus:shadow-outline hover:cursor-pointer hover:text-green" 
+                    type="submit">
+                        {isLoading && <FaSpinner className="animate-spin" />}
                         Create
                     </button>
                 </form>
