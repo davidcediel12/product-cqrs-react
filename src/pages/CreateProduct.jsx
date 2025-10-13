@@ -79,12 +79,7 @@ function ImageSection({ onFormChange, setFormData, formData }) {
 
 export default function CreateProduct() {
 
-    const [formData, setFormData] = useState({
-        productName: '',
-        price: '',
-        stock: '',
-        images: []
-    });
+    const [formData, setFormData] = useState(getInitialFormData());
 
     const [isLoading, setIsLoading] = useState(false);
 
@@ -140,6 +135,7 @@ export default function CreateProduct() {
         console.log("Response from Go", response.data);
 
         setIsLoading(false);
+        setFormData(getInitialFormData());
 
         console.log("End function");
     }
@@ -228,8 +224,8 @@ export default function CreateProduct() {
 
 
                     <button className="flex justify-center items-center gap-2  bg-blue-500 hover:bg-blue-700 text-white font-bold my-8 py-2 px-4 
-                    rounded focus:outline-none focus:shadow-outline hover:cursor-pointer hover:text-green" 
-                    type="submit">
+                    rounded focus:outline-none focus:shadow-outline hover:cursor-pointer hover:text-green"
+                        type="submit">
                         {isLoading && <FaSpinner className="animate-spin" />}
                         Create
                     </button>
@@ -238,4 +234,13 @@ export default function CreateProduct() {
 
         </div>
     )
+}
+
+function getInitialFormData() {
+    return {
+        productName: '',
+        price: '',
+        stock: '',
+        images: []
+    };
 }
