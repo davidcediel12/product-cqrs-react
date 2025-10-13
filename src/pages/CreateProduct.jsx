@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { FaPlus, FaTrash, FaSpinner } from "react-icons/fa";
 import { productService } from "../services/productService";
 import { s3Service } from "../services/s3Service";
-import { toast, ToastContainer  } from "react-toastify";
+import { toast, ToastContainer } from "react-toastify";
 
 
 function ImageSection({ onFormChange, setFormData, formData }) {
@@ -83,6 +83,11 @@ export default function CreateProduct() {
 
     const [isLoading, setIsLoading] = useState(false);
 
+    const isFormValid = formData.images.length > 0 && formData.productName &&
+        formData.price && formData.stock;
+
+    console.log("Form valid " + isFormValid);
+
     useEffect(() => {
         return () => { // When the use effect returns a function, it is called before removing the component
             formData.images.forEach(image => {
@@ -137,7 +142,7 @@ export default function CreateProduct() {
         setIsLoading(false);
         setFormData(getInitialFormData());
         toast.success("Submitted!", {
-            autoClose: 1700, 
+            autoClose: 1700,
 
         });
 
@@ -227,8 +232,11 @@ export default function CreateProduct() {
                         formData={formData} />
 
 
-                    <button className="flex justify-center items-center gap-2  bg-blue-500 hover:bg-blue-700 text-white font-bold my-8 py-2 px-4 
-                    rounded focus:outline-none focus:shadow-outline hover:cursor-pointer hover:text-green"
+                    <button className={`flex 
+                    justify-center items-center gap-2  bg-blue-500 hover:bg-blue-700 text-white font-bold my-8 py-2 px-4 
+                    rounded focus:outline-none focus:shadow-outline hover:text-green 
+                    ${isLoading || !isFormValid ? 'opacity-50 cursor-not allowed' : 'hover:cursor-pointer'}`}
+                        disabled={isLoading || !isFormValid}
                         type="submit">
                         {isLoading && <FaSpinner className="animate-spin" />}
                         Create
