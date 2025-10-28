@@ -1,16 +1,38 @@
 
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Product, ProductImage } from '../types/product';
 import { ProductPage } from '../types/product_page';
 import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
+import { getProductService } from '../services/getProductService';
 
 export default function ProductsMenu() {
+
+    const [productPage, setProductPage] = useState<ProductPage>({
+        pages: 0, items: 0, products: []
+    })
+
+
+    useEffect(() => {
+        const fetchProducts = async () => {
+            const newProductPage = await getProductService.getProducts({
+                page: 0, 
+                size: 6, 
+                name: '',
+                images: true
+            });
+            console.log(`Products fetched ${JSON.stringify(newProductPage)}`)
+            setProductPage(newProductPage);
+        };
+
+        fetchProducts();
+    }, []);
+
     return (
         <div className='flex flex-col items-center justify-center'>
             <SearchBar />
-            <ProductsSection products={PRODUCT_PAGE.products} />
-            <ProductPagination pages={PRODUCT_PAGE.pages} currentPage={0} />
+            <ProductsSection products={productPage.products} />
+            <ProductPagination pages={productPage.pages} currentPage={0} />
         </div>
     );
 }
@@ -31,6 +53,8 @@ function SearchBar() {
 
 function ProductsSection({ products }: { readonly products: Product[] }) {
 
+    console.log(`Products ${JSON.stringify(products, null, 2)}`)
+    
     const productRows = products.map(product => <Product key={product.name} product={product} />)
 
     return (
@@ -83,7 +107,7 @@ function Product({ product }: ProductProps) {
 
     return (
         <div className='border border-gray-300 rounded-lg flex flex-col items-start gap-2 mt-5 shadow-lg'>
-            <img src={image.url} alt={`product ${product.name}`} className='p-4'/>
+            <img src={image.url} alt={`product ${product.name}`} className='p-4' />
 
             <div className='mt-3 px-4'>
                 <h4 className='font-bold text-lg'>{product.name}</h4>
