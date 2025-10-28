@@ -12,12 +12,16 @@ export default function ProductsMenu() {
         pages: 0, items: 0, products: []
     })
 
+    const [pageSize, setPageSize] = useState<number>(6);
+
+    const [pageNumber, setPageNumber] = useState<number>(0);
+
 
     useEffect(() => {
         const fetchProducts = async () => {
             const newProductPage = await getProductService.getProducts({
-                page: 0, 
-                size: 6, 
+                page: pageNumber,
+                size: pageSize,
                 name: '',
                 images: true
             });
@@ -26,23 +30,25 @@ export default function ProductsMenu() {
         };
 
         fetchProducts();
-    }, []);
+    }, [pageSize, pageNumber]);
 
     return (
         <div className='flex flex-col items-center justify-center'>
-            <SearchBar />
+            <SearchBar onPageSize={setPageSize} />
             <ProductsSection products={productPage.products} />
-            <ProductPagination pages={productPage.pages} currentPage={0} />
+            <ProductPagination pages={productPage.pages} currentPage={pageNumber} onPageNumber={setPageNumber} />
         </div>
     );
 }
 
 
-function SearchBar() {
+function SearchBar({ onPageSize }: { readonly onPageSize: (size: number) => void }) {
+
     return (<div className='flex'>
         <input type='text' placeholder='Search product' className='border rounded-lg' />
         <h6 className='mx-2'>Items</h6>
-        <select name="itemsPerPage" id="itemsPerPage" className='rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500'>
+        <select name="itemsPerPage" id="itemsPerPage" className='rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500'
+            onChange={(e) => onPageSize(Number(e.target.value))}>
             <option value="6">6</option>
             <option value="9">9</option>
             <option value="12">12</option>
@@ -54,8 +60,8 @@ function SearchBar() {
 function ProductsSection({ products }: { readonly products: Product[] }) {
 
     console.log(`Products ${JSON.stringify(products, null, 2)}`)
-    
-    const productRows = products.map(product => <Product key={product.name} product={product} />)
+
+    const productRows = products.map(product => <Product key={product.id} product={product} />)
 
     return (
         <div className="grid grid-cols-3 gap-4 mx-10">
@@ -66,7 +72,8 @@ function ProductsSection({ products }: { readonly products: Product[] }) {
 }
 
 
-function ProductPagination({ pages, currentPage }: { readonly pages: number, readonly currentPage: number }) {
+function ProductPagination({ pages, currentPage, onPageNumber }:
+    { readonly pages: number, readonly currentPage: number, readonly onPageNumber: (pageNumber: number) => void }) {
 
     const pagesIndexes: number[] = []
 
@@ -80,7 +87,14 @@ function ProductPagination({ pages, currentPage }: { readonly pages: number, rea
 
     const pagesLayout = pagesIndexes.map(pageIndex =>
         <li key={pageIndex} className={`hover:cursor-pointer hover:text-blue-500
-             ${pageIndex === currentPage && 'font-bold text-green-800'}`}>{pageIndex}</li>)
+             ${pageIndex === currentPage && 'font-bold text-green-800'}`}>
+
+
+            <button
+                className='hover:cursor-pointer'
+                onClick={() => onPageNumber(pageIndex)}>{pageIndex}</button>
+        </li>
+    )
     return (
         <div className='flex items-center'>
             <FaChevronLeft color='gray' className='hover:cursor-pointer' />
