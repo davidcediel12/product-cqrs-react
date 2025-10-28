@@ -3,12 +3,14 @@
 import React from 'react';
 import { Product, ProductImage } from '../types/product';
 import { ProductPage } from '../types/product_page';
+import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 
 export default function ProductsMenu() {
     return (
         <div className='flex flex-col items-center justify-center'>
             <SearchBar />
             <ProductsSection products={PRODUCT_PAGE.products} />
+            <ProductPagination pages={PRODUCT_PAGE.pages} currentPage={0} />
         </div>
     );
 }
@@ -40,6 +42,35 @@ function ProductsSection({ products }: { readonly products: Product[] }) {
 }
 
 
+function ProductPagination({ pages, currentPage }: { readonly pages: number, readonly currentPage: number }) {
+
+    const pagesIndexes: number[] = []
+
+    for (let i = Math.max(0, currentPage - 3); i < currentPage; i++) {
+        pagesIndexes.push(i);
+    }
+
+    for (let i = currentPage; i < currentPage + 3; i++) {
+        pagesIndexes.push(i);
+    }
+
+    const pagesLayout = pagesIndexes.map(pageIndex =>
+        <li key={pageIndex} className={`hover:cursor-pointer hover:text-blue-500
+             ${pageIndex === currentPage && 'font-bold text-green-800'}`}>{pageIndex}</li>)
+    return (
+        <div className='flex items-center'>
+            <FaChevronLeft color='gray' className='hover:cursor-pointer' />
+            <ul className='flex justify-around list-none w-60'>
+
+                {pagesLayout}
+            </ul>
+            <FaChevronRight color='gray' className='hover:cursor-pointer' />
+        </div>
+
+    )
+
+}
+
 interface ProductProps {
     readonly product: Product
 }
@@ -51,10 +82,10 @@ function Product({ product }: ProductProps) {
 
 
     return (
-        <div className='border border-gray-300 rounded-lg flex flex-col items-start gap-2 mt-5'>
-            <img src={image.url} alt={`product ${product.name}`} />
+        <div className='border border-gray-300 rounded-lg flex flex-col items-start gap-2 mt-5 shadow-lg'>
+            <img src={image.url} alt={`product ${product.name}`} className='p-4'/>
 
-            <div className='mt-3'>
+            <div className='mt-3 px-4'>
                 <h4 className='font-bold text-lg'>{product.name}</h4>
                 <h5 className="font-bold">{product.price} </h5>
                 <h5>{product.stock}</h5>
