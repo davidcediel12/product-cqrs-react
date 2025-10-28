@@ -1,6 +1,6 @@
 import { Route, Routes } from 'react-router-dom'
 import './App.css'
-import MainMenu from './pages/MainMenu'
+import MainMenu from './pages/MainMenu/MainMenu'
 import CreateProduct from './pages/CreateProduct'
 
 function App() {
