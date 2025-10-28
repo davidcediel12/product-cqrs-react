@@ -15,6 +15,7 @@ export default function ProductsMenu() {
     const [pageSize, setPageSize] = useState<number>(6);
 
     const [pageNumber, setPageNumber] = useState<number>(0);
+    const [productName, setProductName] = useState<string>('');
 
 
     useEffect(() => {
@@ -22,7 +23,7 @@ export default function ProductsMenu() {
             const newProductPage = await getProductService.getProducts({
                 page: pageNumber,
                 size: pageSize,
-                name: '',
+                name: productName,
                 images: true
             });
             console.log(`Products fetched ${JSON.stringify(newProductPage)}`)
@@ -30,11 +31,11 @@ export default function ProductsMenu() {
         };
 
         fetchProducts();
-    }, [pageSize, pageNumber]);
+    }, [pageSize, pageNumber, productName]);
 
     return (
         <div className='flex flex-col items-center justify-center'>
-            <SearchBar onPageSize={setPageSize} />
+            <SearchBar onPageSize={setPageSize} onProductName={setProductName} />
             <ProductsSection products={productPage.products} />
             <ProductPagination pages={productPage.pages} currentPage={pageNumber} onPageNumber={setPageNumber} />
         </div>
@@ -42,10 +43,12 @@ export default function ProductsMenu() {
 }
 
 
-function SearchBar({ onPageSize }: { readonly onPageSize: (size: number) => void }) {
+function SearchBar({ onPageSize, onProductName }:
+    { readonly onPageSize: (size: number) => void, readonly onProductName: (name: string) => void }) {
 
     return (<div className='flex'>
-        <input type='text' placeholder='Search product' className='border rounded-lg' />
+        <input type='text' placeholder='Search product' className='border rounded-lg'
+            onChange={(e) => onProductName(e.target.value)} />
         <h6 className='mx-2'>Items</h6>
         <select name="itemsPerPage" id="itemsPerPage" className='rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500'
             onChange={(e) => onPageSize(Number(e.target.value))}>
@@ -81,7 +84,7 @@ function ProductPagination({ pages, currentPage, onPageNumber }:
         pagesIndexes.push(i);
     }
 
-    for (let i = currentPage; i < currentPage + 3; i++) {
+    for (let i = currentPage; i < Math.min(currentPage + 3, pages); i++) {
         pagesIndexes.push(i);
     }
 
