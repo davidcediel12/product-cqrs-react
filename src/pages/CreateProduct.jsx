@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { FaPlus, FaTrash, FaSpinner } from "react-icons/fa";
 import { productService } from "../services/productService";
 import { s3Service } from "../services/s3Service";
@@ -83,17 +83,26 @@ export default function CreateProduct() {
 
     const [isLoading, setIsLoading] = useState(false);
 
+    const imageUrlsRef = useRef()
+
+    imageUrlsRef.current = formData.images.map(image => image.url)
+
+
     const isFormValid = formData.images.length > 0 && formData.productName &&
         formData.price && formData.stock;
+
 
     console.log("Form valid " + isFormValid);
 
     useEffect(() => {
         return () => { // When the use effect returns a function, it is called before removing the component
-            formData.images.forEach(image => {
 
-                console.log("Removing image preview to avoid memory leaks");
-                URL.revokeObjectURL(image.url);
+            console.log(`Cleaning image previews for ${imageUrlsRef.current.length} images`)
+
+            imageUrlsRef.current .forEach(image => {
+
+                console.log(`Removing image preview [${image}] to avoid memory leaks`);
+                URL.revokeObjectURL(image);
             })
         }
     }, []);
